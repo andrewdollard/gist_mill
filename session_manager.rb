@@ -1,10 +1,10 @@
 class SessionManager
 
   def initialize
-    # @tokens = {}
-    # @curren_user
-    @tokens = { 'a@b.c' => 'foo' }
-    @current_user = 'a@b.c'
+    @tokens = {}
+    @curren_user
+    # @tokens = { 'a@b.c' => 'foo' }
+    # @current_user = 'a@b.c'
   end
 
   def create_user(email)

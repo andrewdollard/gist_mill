@@ -1,5 +1,3 @@
-#!/bin/ruby
-require 'byebug'
 require_relative './session_manager'
 require_relative './post_manager'
 
