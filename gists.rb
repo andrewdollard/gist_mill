@@ -1,5 +1,6 @@
 #!/bin/ruby
 require 'byebug'
+require_relative './session_manager'
 
 def print_help
   puts <<-HELP
@@ -13,50 +14,24 @@ del    [post id]                  delete a post
 HELP
 end
 
-@tokens = {}
-@current_user = nil
-# @tokens = { 'a@b.c' => 'foo' }
-# @current_user = 'a@b.c'
 @posts = {}
+@sessions = SessionManager.new
 
-def create_user(email)
-  # Assumptions:
-  # Any email matching `[something] @ [something] . [something]` is valid
-  return "Invalid email address" unless email.match(/.+@.+\..+/)
-  return "Email address not available" if @tokens[email]
-
-  token = (0...8).map { (97 + rand(26)).chr }.join
-  @tokens[email] = token
-  "Remember this: #{token}"
-end
-
-def create_session(email, token)
-  found = @tokens[email]
-  return "Invalid email address or token" unless found && found == token
-
-  @current_user = email
-  "Ok"
-end
-
-def create_post(text)
-  return "No one logged in" unless @current_user
-  @posts[@current_user] ||= []
+def create_post(user, text)
+  @posts[user] ||= []
   id = (0...8).map { (97 + rand(26)).chr }.join
   post = {
     :id => id,
     :text => text,
     :time => Time.now,
   }
-
-  @posts[@current_user].unshift(post)
+  @posts[user].unshift(post)
   "Created"
 end
 
 def list_posts
-  return "No one logged in" unless @current_user
-
-  posts = @posts[@current_user] || []
-
+  return "No one logged in" unless @sessions.logged_in?
+  posts = @posts[@sessions.current_user] || []
   posts
     .sort_by{ |p| p[:time] }
     .reverse
@@ -65,13 +40,12 @@ def list_posts
 end
 
 def edit_post(id, text)
-  return "No one logged in" unless @current_user
-
-  post = @posts[@current_user]
+  return "No one logged in" unless @sessions.logged_in?
+  post = @posts[@sessions.current_user]
     .detect { |p| p[:id] == id }
   return "Post not found" unless post
 
-  @posts[@current_user] = @posts[@current_user]
+  @posts[@sessions.current_user] = @posts[@sessions.current_user]
     .reject { |p| p[:id] == id }
     .unshift(post.merge({
       :text => text,
@@ -82,13 +56,12 @@ def edit_post(id, text)
 end
 
 def delete_post(id)
-  return "No one logged in" unless @current_user
-
-  post = @posts[@current_user]
+  return "No one logged in" unless @sessions.logged_in?
+  post = @posts[@sessions.current_user]
     .detect { |p| p[:id] == id }
   return "Post not found" unless post
 
-  @posts[@current_user] = @posts[@current_user]
+  @posts[@sessions.current_user] = @posts[@sessions.current_user]
     .reject { |p| p[:id] == id }
 
   "Deleted"
@@ -106,17 +79,21 @@ loop do
   when "help"
     print_help
   when "signup"
-    puts create_user(input[1])
+    puts @sessions.create_user(input[1])
   when "login"
-    puts create_session(input[1], input[2])
+    puts @sessions.create_session(input[1], input[2])
 
   when "post"
-    # Assumptions:
-    # Text arg will always be present
-    # Text will always be surrounded by double-quotes
-    # Last quote will not have trailing whitespace
-    text = input[1..-1].join(' ').match(/^\s*\"(.*)\"$/).captures.first
-    puts create_post(text)
+    user = @sessions.current_user
+    if user
+      # Text arg will always be present
+      # Text will always be surrounded by double-quotes
+      # Last quote will not have trailing whitespace
+      text = input[1..-1].join(' ').match(/^\s*\"(.*)\"$/).captures.first
+      puts create_post(user, text)
+    else
+      puts "No one logged in"
+    end
 
   when "list"
     puts list_posts
