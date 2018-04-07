@@ -29,9 +29,8 @@ def create_post(user, text)
   "Created"
 end
 
-def list_posts
-  return "No one logged in" unless @sessions.logged_in?
-  posts = @posts[@sessions.current_user] || []
+def list_posts(user)
+  posts = @posts[user] || []
   posts
     .sort_by{ |p| p[:time] }
     .reverse
@@ -39,13 +38,11 @@ def list_posts
     .join("\n")
 end
 
-def edit_post(id, text)
-  return "No one logged in" unless @sessions.logged_in?
-  post = @posts[@sessions.current_user]
-    .detect { |p| p[:id] == id }
+def edit_post(user, text)
+  post = @posts[user].detect { |p| p[:id] == id }
   return "Post not found" unless post
 
-  @posts[@sessions.current_user] = @posts[@sessions.current_user]
+  @posts[user] = @posts[user]
     .reject { |p| p[:id] == id }
     .unshift(post.merge({
       :text => text,
@@ -55,15 +52,11 @@ def edit_post(id, text)
   "Edited"
 end
 
-def delete_post(id)
-  return "No one logged in" unless @sessions.logged_in?
-  post = @posts[@sessions.current_user]
-    .detect { |p| p[:id] == id }
+def delete_post(user, id)
+  post = @posts[user].detect { |p| p[:id] == id }
   return "Post not found" unless post
 
-  @posts[@sessions.current_user] = @posts[@sessions.current_user]
-    .reject { |p| p[:id] == id }
-
+  @posts[user] = @posts[user].reject { |p| p[:id] == id }
   "Deleted"
 end
 
@@ -96,18 +89,33 @@ loop do
     end
 
   when "list"
-    puts list_posts
+    user = @sessions.current_user
+    if user
+      puts list_posts(user)
+    else
+      puts "No one logged in"
+    end
 
   when "edit"
     # Assumption:
     # Text arg will always be present
     # Text will always be surrounded by double-quotes
     # Last quote will not have trailing whitespace
-    text = input[2..-1].join(' ').match(/^\s*\"(.*)\"$/).captures.first
-    puts edit_post(input[1], text)
+    user = @sessions.current_user
+    if user
+      text = input[2..-1].join(' ').match(/^\s*\"(.*)\"$/).captures.first
+      puts edit_post(user, text)
+    else
+      puts "No one logged in"
+    end
 
   when "del"
-    puts delete_post(input[1])
+    user = @sessions.current_user
+    if user
+    puts delete_post(user, input[1])
+    else
+      puts "No one logged in"
+    end
 
   else
     puts "Unrecognized command"
