@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <title>HTTP API HELP</title>
+    <style type='text/css'>
+      th { text-align: left; }
+    </style>
+  </head>
+
+  <body>
+    <table border='1' cellspacing='0' cellpadding='4'>
+      <tr>
+        <th>Method</th>
+        <th>Path</th>
+        <th>Header</th>
+        <th>Body</th>
+        <th>Description</th>
+      </tr>
+
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/help</code></td>
+        <td></td>
+        <td></td>
+        <td>Show this page</td>
+      </tr>
+
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/signup</code></td>
+        <td><code></code></td>
+        <td>Email address</td>
+        <td>Signup with a new email address (returns a token)</td>
+      </tr>
+
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/posts</code></td>
+        <td><code>Authentication: Token [email address]:[auth token]</code></td>
+        <td></td>
+        <td>List all posts for user</td>
+      </tr>
+
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/posts</code></td>
+        <td><code>Authentication: Token [email address]:[auth token]</code></td>
+        <td>Post Content</td>
+        <td>Create a new post</td>
+      </tr>
+
+    </table>
+  </body>
+</html>

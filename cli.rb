@@ -1,5 +1,5 @@
-require_relative './session_manager'
 require_relative './post_manager'
+require_relative './authenticator'
 
 def print_help
   puts <<-HELP
@@ -13,8 +13,9 @@ del    [post id]                  delete a post
 HELP
 end
 
-@sessions = SessionManager.new
-@posts = PostManager.new
+posts = PostManager.new
+auth = Authenticator.new
+current_user = nil
 
 def get_input_string(input, start, finish)
   # Text arg will always be present
@@ -35,27 +36,31 @@ loop do
   when "help" then print_help
 
   when "signup"
-    puts @sessions.create_user(input[1])
+    success, message = auth.create_user(input[1])
+    puts message
   when "login"
-    puts @sessions.create_session(input[1], input[2])
+    current_user = input[1] if auth.authenticate(input[1], input[2])
+    puts message
 
   when "post", "list", "edit", "del"
-    user = @sessions.current_user
-    if user
+    if current_user
       case command
       when "post"
         text = get_input_string(input, 1, -1)
-        puts @posts.create(user, text)
+        posts.create(current_user, text)
+        puts "Ok"
 
       when "list"
-        puts @posts.list(user)
+        puts posts.list(current_user)
+          .map { |p| "#{p[:id]} #{p[:time].to_s} #{p[:text]}" }
+          .join("\n")
 
       when "edit"
         text = get_input_string(input, 2, -1)
-        puts @posts.edit(user, input[1], text)
+        puts posts.edit(current_user, input[1], text)
 
       when "del"
-        puts @posts.delete(user, input[1])
+        puts posts.delete(current_user, input[1])
       end
     else
       puts "No one logged in"

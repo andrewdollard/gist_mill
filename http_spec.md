@@ -3,20 +3,20 @@
 GET /help
 
 POST /signup
-  body: email address
-  response: token
+  request body: email address
+  response body: token
 
 POST /login
-  header: token
-  body: email address
+  request header: token
+  request body: email address
 
 POST /post
-  body: post content
+  request body: post content
 
 GET /list
-  body: list of posts
+  response body: list of posts
 
 PUT /posts/:id
-  body: new post content
+  request body: new post content
 
 DELETE /posts/:id
