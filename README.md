@@ -1,5 +1,5 @@
-`ruby cli/cli.rb` && `help`
+`ruby interfaces/cli.rb` && `help`
 
 or
 
-`ruby http/http.rb` && `GET localhost:8000/help`
+`ruby interfaces/http.rb` && `GET localhost:8000/help`
