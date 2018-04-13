@@ -1,5 +1,5 @@
-`ruby cli.rb`
+`ruby cli/cli.rb`
 
 or
 
-`ruby http.rb`
+`ruby http/http.rb`

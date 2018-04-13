@@ -1,5 +1,5 @@
-require_relative './authenticator'
-require_relative './post_manager'
+require_relative '../services/authenticator'
+require_relative '../services/post_manager'
 require 'socket'
 
 @auth = Authenticator.new
