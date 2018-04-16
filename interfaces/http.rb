@@ -43,7 +43,7 @@ loop do
       file = File.read('http_help.html')
       client.puts "HTTP/1.1 200 OK"
       client.puts "Content-Length: #{file.length}\r\n"
-      client.puts "Content-Type: text/html\r\n\r\n"
+      client.puts "Content-Type: text/html\r\n"
       client.puts file
 
   when ['POST', 'signup']
@@ -52,17 +52,17 @@ loop do
       if success
         client.puts "HTTP/1.1 200 OK"
         client.puts "Content-Length: #{message.length}\r\n"
-        client.puts "Content-Type: text/plain\r\n\r\n"
+        client.puts "Content-Type: text/plain\r\n"
         client.puts message
       else
-        client.puts "HTTP/1.1 400 Bad Request\r\n\r\n"
+        client.puts "HTTP/1.1 400 Bad Request\r\n"
       end
 
   when ['GET', 'posts']
       user = authenticate(headers['Authentication'])
       if user
         client.puts "HTTP/1.1 200 OK"
-        client.puts "Content-Type: text/json\r\n\r\n"
+        client.puts "Content-Type: text/json\r\n"
         client.puts "{\"posts\":["
         posts.list(user).each_with_index do |post, i|
           client.puts "," unless i == 0
@@ -72,7 +72,7 @@ loop do
         end
         client.puts "\n]}"
       else
-        client.puts "HTTP/1.1 400 Bad Request\r\n\r\n"
+        client.puts "HTTP/1.1 400 Bad Request\r\n"
       end
 
   when ['POST', 'posts']
@@ -80,9 +80,9 @@ loop do
       if user
         text = client.read(headers["Content-Length"].to_i)
         posts.create(user, text)
-        client.puts "HTTP/1.1 200 OK\r\n\r\n"
+        client.puts "HTTP/1.1 200 OK\r\n"
       else
-        client.puts "HTTP/1.1 400 Bad Request\r\n\r\n"
+        client.puts "HTTP/1.1 400 Bad Request\r\n"
       end
 
   when ['PUT', 'posts']
@@ -91,23 +91,23 @@ loop do
         text = client.read(headers["Content-Length"].to_i)
         result, message = posts.edit(user, id, text)
         if result
-          client.puts "HTTP/1.1 200 OK\r\n\r\n"
+          client.puts "HTTP/1.1 200 OK\r\n"
         else
           client.puts "HTTP/1.1 400 Bad Request"
-          client.puts "Content-Type: text/plain\r\n\r\n"
+          client.puts "Content-Type: text/plain\r\n"
           client.puts message
         end
       else
-        client.puts "HTTP/1.1 400 Bad Request\r\n\r\n"
+        client.puts "HTTP/1.1 400 Bad Request\r\n"
       end
 
   when ['DELETE', 'posts']
       user = authenticate(headers['Authentication'])
       if user
         posts.delete(user, id)
-        client.puts "HTTP/1.1 200 OK\r\n\r\n"
+        client.puts "HTTP/1.1 200 OK\r\n"
       else
-        client.puts "HTTP/1.1 400 Bad Request\r\n\r\n"
+        client.puts "HTTP/1.1 400 Bad Request\r\n"
       end
 
   else
