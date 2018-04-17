@@ -9,6 +9,7 @@ class HttpService
     @auth = Authenticator.new
     @posts = PostManager.new
     @server = TCPServer.new(8000)
+    @idem_tokens = {}
   end
 
   def run
@@ -57,6 +58,7 @@ class HttpService
     when ['POST', 'posts']
       user = authenticate(headers['Authentication'])
       if user
+        respond_200 && return if already_seen(user, headers['Idempotency Token'])
         text = @client.read(headers["Content-Length"].to_i)
         @posts.create(user, text)
         respond_200
@@ -67,6 +69,7 @@ class HttpService
     when ['PUT', 'posts']
       user = authenticate(headers['Authentication'])
       if user
+        respond_200 && return if already_seen(user, headers['Idempotency Token'])
         text = @client.read(headers["Content-Length"].to_i)
         result, message = @posts.edit(user, id, text)
         if result
@@ -121,6 +124,12 @@ class HttpService
     return nil unless @auth.authenticate(email, token)
 
     email
+  end
+
+  def already_seen(user, idem_token)
+    return true if @idem_tokens[user] && @idem_tokens[user].include?(idem_token)
+    (@idem_tokens[user] ||= []).unshift(idem_token)
+    false
   end
 
   def respond_200(type='text/plain', body='')
