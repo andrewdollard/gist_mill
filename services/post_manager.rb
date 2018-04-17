@@ -2,13 +2,13 @@ class PostManager
 
   def initialize
     @posts = {}
-    # @posts = {
-    #   'a@b.c' => [
-    #     {:id => 'aaa', :text => 'foo', :time => Time.now},
-    #     {:id => 'bbb', :text => 'bar', :time => Time.now},
-    #     {:id => 'ccc', :text => 'rab', :time => Time.now},
-    #   ]
-    # }
+    @posts = {
+      'a@b.c' => [
+        {:id => 'aaa', :text => 'foo', :time => Time.now},
+        {:id => 'bbb', :text => 'bar', :time => Time.now},
+        {:id => 'ccc', :text => 'rab', :time => Time.now},
+      ]
+    }
   end
 
   def create(user, text)

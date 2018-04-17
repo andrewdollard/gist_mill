@@ -2,7 +2,7 @@ class Authenticator
 
   def initialize
     @tokens = {}
-    # @tokens = { 'a@b.c' => 'foo' }
+    @tokens = { 'a@b.c' => 'foo' }
   end
 
   def create_user(email)
